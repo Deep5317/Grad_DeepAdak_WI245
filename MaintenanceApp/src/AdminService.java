@@ -16,13 +16,13 @@ public class AdminService {
             System.out.println("1. Add Owner");
             System.out.println("2. Edit Owner");
             System.out.println("3. Remove Owner");  
+            System.out.println("4. View Available Sites");
             System.out.println("5. Assign Site");
             System.out.println("6. View Maintenance");
             System.out.println("7. Approve Site Requests");
             System.out.println("8. View Pending Requests");
-            System.out.println("9. View Available Sites");
-            System.out.println("10. View All Owners");
-            System.out.println("11. Exit");
+            System.out.println("9. View All Owners");
+            System.out.println("10. Exit");
 
             int ch = sc.nextInt();
 
@@ -112,12 +112,9 @@ public class AdminService {
                     }
                     break;
                 case 9:
-                    dao.viewAvailableSites();
-                    break;
-                case 10:
                     dao.viewAllOwners();
                     break;
-                case 11:
+                case 10:
                     return;
 
             }

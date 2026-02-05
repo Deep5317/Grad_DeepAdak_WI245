@@ -4,29 +4,27 @@ import java.sql.*;
 import java.util.Scanner;
 
 public class AdminDAO {
-    public void viewAllOwners(){
+    public void viewAllOwners() {
 
-    try(Connection con = DBUtil.getConnection()){
+        try (Connection con = DBUtil.getConnection()) {
 
-        String sql =
-        "SELECT user_id,username FROM users WHERE role='OWNER'";
+            String sql = "SELECT user_id,username FROM users WHERE role='OWNER'";
 
-        Statement st = con.createStatement();
-        ResultSet rs = st.executeQuery(sql);
+            Statement st = con.createStatement();
+            ResultSet rs = st.executeQuery(sql);
 
-        System.out.println("\n=== OWNERS ===");
+            System.out.println("\n=== OWNERS ===");
 
-        while(rs.next()){
-            System.out.println(
-              "ID: "+rs.getInt("user_id")+
-              " | Username: "+rs.getString("username")
-            );
+            while (rs.next()) {
+                System.out.println(
+                        "ID: " + rs.getInt("user_id") +
+                                " | Username: " + rs.getString("username"));
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-
-    }catch(Exception e){
-        e.printStackTrace();
     }
-}
 
     // ADD OWNER
     public void addOwner(String username, String password) {
@@ -164,31 +162,57 @@ public class AdminDAO {
 
         try (Connection con = DBUtil.getConnection()) {
 
-            // check site availability
-            String check = "SELECT * FROM sites WHERE site_number=? AND owner_id IS NULL";
+            con.setAutoCommit(false);
 
-            PreparedStatement ps1 = con.prepareStatement(check);
-            ps1.setInt(1, siteNo);
+            // get site details
+            String get = "SELECT site_id,length,width FROM sites " +
+                    "WHERE site_number=? AND owner_id IS NULL";
 
-            ResultSet rs = ps1.executeQuery();
+            PreparedStatement ps = con.prepareStatement(get);
+            ps.setInt(1, siteNo);
+
+            ResultSet rs = ps.executeQuery();
 
             if (!rs.next()) {
                 System.out.println("Site not available!");
                 return;
             }
 
-            // assign
-            String sql = "UPDATE sites SET owner_id=?, property_type=?, site_status='OCCUPIED' WHERE site_number=?";
+            int siteId = rs.getInt("site_id");
+            int length = rs.getInt("length");
+            int width = rs.getInt("width");
 
-            PreparedStatement ps2 = con.prepareStatement(sql);
+            int area = length * width;
 
-            ps2.setInt(1, ownerId);
-            ps2.setString(2, type);
-            ps2.setInt(3, siteNo);
+            // assign site
+            String upd = "UPDATE sites SET owner_id=?,property_type=?,site_status='OCCUPIED' " +
+                    "WHERE site_id=?";
 
-            ps2.executeUpdate();
+            PreparedStatement ups = con.prepareStatement(upd);
+            ups.setInt(1, ownerId);
+            ups.setString(2, type);
+            ups.setInt(3, siteId);
 
-            System.out.println("Site assigned successfully!");
+            ups.executeUpdate();
+
+            // 🔥 CREATE MAINTENANCE
+            int rate = 9;
+            if(type.equals("OpenSite"))
+                rate = 6;
+            double yearly = area * rate ;
+
+            String ins = "INSERT INTO maintenance(site_id,total_amount,paid_amount,status) " +
+                    "VALUES(?,?,0,'PENDING')";
+
+            PreparedStatement ims = con.prepareStatement(ins);
+            ims.setInt(1, siteId);
+            ims.setDouble(2, yearly);
+
+            ims.executeUpdate();
+
+            con.commit();
+
+            System.out.println("✅ Site assigned & maintenance created!");
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -239,7 +263,6 @@ public class AdminDAO {
                     return;
                 }
                 double pending = total - newPaid;
-               
 
                 String mStatus = "PARTIAL";
                 if (newPaid == 0)
@@ -274,7 +297,7 @@ public class AdminDAO {
                 ips.setInt(1, siteId);
                 ips.setDouble(2, total);
                 ips.setDouble(3, payAmount);
-                
+
                 ips.setString(4, mStatus);
 
                 ips.executeUpdate();
@@ -404,7 +427,6 @@ public class AdminDAO {
             e.printStackTrace();
         }
     }
-
 
     public void viewPendingRequests() {
 

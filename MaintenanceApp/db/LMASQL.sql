@@ -27,6 +27,8 @@ INSERT INTO sites(site_number,length,width)
 SELECT i,30,50 FROM generate_series(11,20) i;
 INSERT INTO sites(site_number,length,width)
 SELECT i,30,40 FROM generate_series(21,35) i;
+
+
 CREATE TABLE maintenance (
     maint_id SERIAL PRIMARY KEY,
 
