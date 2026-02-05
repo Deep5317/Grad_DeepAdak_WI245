@@ -17,7 +17,8 @@ public class OwnerService {
             System.out.println("3. Request Site Status Change");
             System.out.println("4. Password Change");
             System.out.println("5. View My Requests");
-            System.out.println("6. Exit");
+            System.out.println("6. Pay Maintenance");
+            System.out.println("7. Exit");
 
             int ch = sc.nextInt();
 
@@ -49,8 +50,11 @@ public class OwnerService {
                 case 5:
                     dao.viewMyRequests(ownerId);
                     break;
-
                 case 6:
+                    dao.payMaintenanceFlow(ownerId);
+                    break;
+
+                case 7:
                     return;
 
             }

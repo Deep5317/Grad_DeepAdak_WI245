@@ -1,10 +1,12 @@
 package src;
+
 import java.sql.Statement;
+import java.util.Scanner;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
-public class OwnerDAO  {
+public class OwnerDAO {
     public void viewMySite(int ownerId) {
 
         try (Connection con = DBUtil.getConnection()) {
@@ -180,7 +182,7 @@ public class OwnerDAO  {
             String sql = "SELECT site_number,length,width FROM sites WHERE owner_id IS NULL";
 
             Statement st = con.createStatement();
-            ResultSet rs =  st.executeQuery(sql);
+            ResultSet rs = st.executeQuery(sql);
 
             System.out.println("\nAvailable Sites:");
 
@@ -257,4 +259,72 @@ public class OwnerDAO  {
         }
     }
 
+    public void payMaintenanceFlow(int ownerId) {
+
+        try (Connection con = DBUtil.getConnection()) {
+
+            Scanner sc = new Scanner(System.in);
+
+            String sql = "SELECT m.maint_id,s.site_number,m.total_amount," +
+                    "m.paid_amount,m.pending_amount,m.status " +
+                    "FROM maintenance m " +
+                    "JOIN sites s ON m.site_id=s.site_id " +
+                    "WHERE s.owner_id=?";
+
+            PreparedStatement ps = con.prepareStatement(sql);
+            ps.setInt(1, ownerId);
+
+            ResultSet rs = ps.executeQuery();
+
+            if (!rs.next()) {
+                System.out.println("No maintenance record!");
+                return;
+            }
+
+            int mid = rs.getInt("maint_id");
+            double total = rs.getDouble("total_amount");
+            double paid = rs.getDouble("paid_amount");
+            double pending = rs.getDouble("pending_amount");
+
+            System.out.println("\n=== MAINTENANCE DETAILS ===");
+            System.out.println("Site: " + rs.getInt("site_number"));
+            System.out.println("Total: ₹" + total);
+            System.out.println("Paid: ₹" + paid);
+            System.out.println("Pending: ₹" + pending);
+            System.out.println("Status: " + rs.getString("status"));
+
+            
+            if (pending == 0) {
+                System.out.println("\nNo Maintenance is pending. You're all paid up!");
+                return;
+            }
+
+            // Ask payment
+            System.out.print("\nEnter amount to pay: ");
+            double amt = sc.nextDouble();
+
+            if (amt > pending) {
+                System.out.println("Cannot pay more than pending!");
+                return;
+            }
+
+            double newPaid = paid + amt;
+
+            String newStatus = (newPaid == total) ? "PAID" : "PENDING";
+
+            String upd = "UPDATE maintenance SET paid_amount=?,status=? WHERE maint_id=?";
+
+            PreparedStatement ups = con.prepareStatement(upd);
+            ups.setDouble(1, newPaid);
+            ups.setString(2, newStatus);
+            ups.setInt(3, mid);
+
+            ups.executeUpdate();
+
+            System.out.println("Payment successful!");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }

@@ -17,13 +17,12 @@ public class AdminService {
             System.out.println("2. Edit Owner");
             System.out.println("3. Remove Owner");  
             System.out.println("5. Assign Site");
-            System.out.println("6. Collect Maintenance");
-            System.out.println("7. View Maintenance");
-            System.out.println("8. Approve Site Requests");
-            System.out.println("9. View Pending Requests");
-            System.out.println("10. View Available Sites");
-            System.out.println("11. View All Owners");
-            System.out.println("12. Exit");
+            System.out.println("6. View Maintenance");
+            System.out.println("7. Approve Site Requests");
+            System.out.println("8. View Pending Requests");
+            System.out.println("9. View Available Sites");
+            System.out.println("10. View All Owners");
+            System.out.println("11. Exit");
 
             int ch = sc.nextInt();
 
@@ -87,19 +86,8 @@ public class AdminService {
                     }
                     break;
 
+
                 case 6:
-                    if (verifyAdmin(dao)) {
-                        System.out.print("Site Number: ");
-                        int s = sc.nextInt();
-
-                        System.out.print("Amount Paid: ");
-                        double amt = sc.nextDouble();
-
-                        dao.collectMaintenance(s, amt);
-                    }
-                    break;
-
-                case 7:
                     System.out.println("1. All Sites");
                     System.out.println("2. Specific Site");
 
@@ -113,23 +101,23 @@ public class AdminService {
                     }
                     break;
 
-                case 8:
+                case 7:
                     if (verifyAdmin(dao)) {
                         dao.handleSiteRequests();
                     }
                     break;
-                case 9:
+                case 8:
                     if (verifyAdmin(dao)) {
                         dao.viewPendingRequests();
                     }
                     break;
-                case 10:
+                case 9:
                     dao.viewAvailableSites();
                     break;
-                case 11:
+                case 10:
                     dao.viewAllOwners();
                     break;
-                case 12:
+                case 11:
                     return;
 
             }
