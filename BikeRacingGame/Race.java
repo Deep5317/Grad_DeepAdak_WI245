@@ -6,12 +6,13 @@ import java.util.concurrent.*;
 class RaceResult {
     String name;
     double speed;
-    long finishTime;
+    
+    long totalTime;
 
-    RaceResult(String name,double speed,long finishTime){
+    RaceResult(String name,double speed,long totalTime){
         this.name=name;
         this.speed=speed;
-        this.finishTime=finishTime;
+        this.totalTime=totalTime;
     }
 }
 
@@ -36,7 +37,6 @@ class Racer implements Callable<RaceResult>{
 
         int covered=0;
         int nextMilestone=100;
-
         long start=System.currentTimeMillis();
 
         while(covered < distance){
@@ -55,7 +55,8 @@ class Racer implements Callable<RaceResult>{
         long finish=System.currentTimeMillis();
 
         System.out.println(name+" FINISHED!");
-
+        System.out.println("Start time:"+start);
+        System.out.println("Finish time:"+finish);
         return new RaceResult(name,speed,finish-start);
     }
 }
@@ -114,7 +115,7 @@ public class Race {
 
         executor.shutdown();
 
-        results.sort(Comparator.comparingLong(r->r.finishTime));
+        results.sort(Comparator.comparingLong(r->r.totalTime));
 
         System.out.println("\n===== LEADERBOARD =====");
 
@@ -124,7 +125,7 @@ public class Race {
                 "Rank "+rank++
                 +" | "+r.name
                 +" | Speed: "+r.speed+" m/s"
-                +" | Time: "+r.finishTime/1000.0+" sec"
+                +" | Speed: "+r.totalTime/1000.0+" sec"
             );
         }
     }
