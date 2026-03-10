@@ -1,0 +1,42 @@
+<h3>Students</h3>
+
+<table border="1">
+
+<tr>
+<th>RegNo</th>
+<th>RollNo</th>
+<th>Name</th>
+<th>Standard</th>
+<th>School</th>
+<th *ngIf="admin">Action</th>
+</tr>
+
+<tr *ngFor="let s of students">
+
+<td>{{s.regNo}}</td>
+<td>{{s.rollNo}}</td>
+<td>{{s.name}}</td>
+<td>{{s.standard}}</td>
+<td>{{s.school}}</td>
+
+<td *ngIf="admin">
+<button (click)="edit(s)">Edit</button>
+<button (click)="delete(s.regNo)">Delete</button>
+</td>
+
+</tr>
+
+</table>
+<br>
+<div *ngIf="editingStudent">
+
+<h3>Edit Student</h3>
+
+<input [(ngModel)]="editingStudent.rollNo" placeholder="Roll No"><br>
+<input [(ngModel)]="editingStudent.name" placeholder="Name"><br>
+<input [(ngModel)]="editingStudent.standard" placeholder="Standard"><br>
+<input [(ngModel)]="editingStudent.school" placeholder="School"><br>
+
+<button (click)="update()">Update</button>
+
+</div>
